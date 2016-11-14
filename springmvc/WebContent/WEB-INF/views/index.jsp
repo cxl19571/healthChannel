@@ -17,32 +17,6 @@
     
     <script type="text/javascript">
     
-       $(function(){
-    	   $.get("domain/test2.top",function(data){
-    		   
-    		   var tt=data['list'][0];
-   // 		   for(var i=0;i<tt.length;i++){
-   // 			   
-   // 			   var name=tt[i].userName;
-   // 			   var age=tt[i].age;
-    //			   
-    //			   var tr="<tr><td>"+name+"</td><td>"+age+"</td></tr>";
-    			   
-    //			  $("table").append(tr)
-    //			   console.info(data['list'][1].userName);
-    //		   }
-    		 
-            $.each(tt,function(index,element){
-            	
-            	$("font").each(function(i){
-            		
-            		$(this).text(element)
-            	});
-            	console.info(index,element);
-            });
-    		   
-    	   });
-       });
     </script>
     </head>
     <body>
@@ -50,8 +24,13 @@
      this is myPage!!!!  
      
      <div>
-        <label>名字:</label><font color="red"></font>
-        <label>年龄:</label><font color="grey"></font>
+        <form enctype="Multipart/form-data">
+        
+              名称:<input type="text" name="userName"/>
+              年龄:<input type="text" name="age"/>
+             <input type="file" name="file"/>
+            <input type="submit" value="提交" onclick="aa()"/>
+        </form>
      </div>
      
     </body>

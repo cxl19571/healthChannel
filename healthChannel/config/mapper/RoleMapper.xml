@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.laya.system.mapper.RoleMapper">
+	<resultMap type="com.laya.system.model.Role" id="roleMap">
+		<id property="id" column="id" />
+		<result property="userType" column="userType" />
+		<result property="createTime" column="createTime" />
+		<result property="userName" column="userName" />
+		<result property="parentId" column="parentId" />
+		<result property="userSex" column="userSex" />
+		<result property="headPicture" column="headPicture" />
+		<result property="isRegister" column="isRegister" />
+
+	</resultMap>
+	<!-- 添加角色 -->
+	<insert id="addRole" parameterType="com.laya.system.model.Role">
+		insert into role (id,userType, createTime, headPicture, userName,
+		userSex, parentId,isRegister) values(
+
+		<if test="#{id}!=null and #{id}!=''">
+			#{id},
+		</if>
+		
+		<if test="#{userType}!=null and #{userType}!=''">
+			#{userType},
+		</if>
+		<if test="#{createTime}!=null and #{createTime}!=''">
+			#{createTime},
+		</if>
+		<if test="#{parentId}!=null and #{parentId}!=''">
+			#{headPicture},
+		</if>
+		<if test="#{userName}!=null and #{userName}!=''">
+			#{userName},
+		</if>
+		<if test="#{userSex}!=null and #{userSex}!=''">
+			#{userSex},
+		</if>
+		<if test="#{parentId}!=null and #{parentId}!=''">
+			#{parentId},
+		</if>
+		<if test="#{isRegister}!=null and #{isRegister}!=''">
+			#{isRegister}
+		</if>
+		)
+	</insert>
+	<!-- 查询当前用户下所有成员信息 -->
+	<select id="getRoleList" parameterType="String" resultMap="roleMap">
+
+		select * from role where parentId=#{parentId}
+
+	</select>
+	<!--通过id删除成员 -->
+	<delete id="deleteRole" parameterType="String">
+		delete from role where id=#{id}
+	</delete>
+
+	<!-- 删除家庭成员的检测数据 -->
+	<delete id="deleteTestResult" parameterType="map">
+		delete from test where userPhone=#{userPhone} and userId=#{userId}
+	</delete>
+
+	<!-- 编辑家庭成员 -->
+	<update id="editMembers" parameterType="com.laya.system.model.Role">
+		update role
+		<set>
+			<if test="#{userType}!=null and #{userType}!=''">
+				userType=#{userType},
+			</if>
+			<if test="#{createTime}!= null and #{createTime}!=''">
+				createTime=#{createTime},
+			</if>
+			<if test="#{headPicture}!=null and #{headPicture}!=''">
+				headPicture=#{headPicture},
+			</if>
+			<if test="#{userName}!=null and #{userName}!=''">
+				userName=#{userName},
+			</if>
+			<if test="#{userSex}!=null and #{userName}!=''">
+				userSex=#{userSex} ,
+			</if>
+			<if test="#{parentId}!=null and #{parentId}!=''">
+				parentId=#{parentId},
+			</if>
+			<if test="#{isRegister}!=null and #{isRegister}!=''">
+				isRegister=#{isRegister}
+			</if>
+			<where>
+				<if test="#{id}!=null">
+					id=#{id}
+				</if>
+			</where>
+		</set>
+	</update>
+
+	<!-- 通过用户手机号和默认类型查询角色id -->
+	<select id="findRoleIdByPhone" parameterType="String"
+		resultType="Integer">
+		select id from role where parentId=#{parentId} and userType=0
+	</select>
+
+	<!-- 通过id查询成员信息 -->
+	<select id="findRoleById" parameterType="String" resultMap="roleMap">
+		select * from role where id=#{id}
+	</select>
+
+</mapper>

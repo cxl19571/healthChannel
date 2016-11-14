@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.laya.health.mapper.TestMapper">
+
+	<resultMap type="com.laya.health.model.Test" id="testMap">
+		<id property="id" column="id" />
+		<result property="userId" column="userId" />
+		<result property="status" column="status" />
+		<result property="userPhone" column="userPhone" />
+		<result property="createTime" column="createTime" />
+		<result property="result" column="result" />
+		<result property="testType" column="testType" />
+		<result property="temperature" column="temperature" />
+		<result property="userType" column="userType" />
+		<result property="headPicture" column="headPicture" />
+		<result property="userName" column="userName" />
+		<result property="userSex" column="userSex" />
+		<result property="isRegister" column="isRegister" />
+	</resultMap>
+
+	<!-- 添加检测结果 -->
+
+	<insert id="addTestResult" parameterType="com.laya.health.model.Test">
+		insert into test
+		(id,userPhone,userId,status,createTime,result,testType,temperature)
+		values(
+		<if test="#{id}!=null and #{id}!=''">
+			#{id},
+		</if>
+		<if test="#{userPhone}!=null and #{userPhone!=''}">
+			#{userPhone},
+		</if>
+		<if test="#{userId}!=null and #{userId}!=''">
+			#{userId},
+		</if>
+		<if test="#{status}!=null and #{status}!=''">
+			#{status},
+		</if>
+		<if test="#{createTime}!=null and #{createTime}!=''">
+			#{createTime},
+		</if>
+		<if test="#{result}!=null and #{result}!=''">
+			#{result},
+		</if>
+		<if test="#{testType}!=null and #{testType}!=''">
+			#{testType},
+		</if>
+		<if test="#{temperature}!=null and #{temperature}!=''">
+			#{temperature}
+		</if>
+		)
+	</insert>
+
+
+	<!-- 更新检测结果 -->
+
+	<update id="updateTestResult" parameterType="com.laya.health.model.Test">
+		update test
+		<set>
+			<if test="#{userPhone}!=null and #{userPhone}!=''">
+				userPhone=#{userPhone},
+			</if>
+			<if test="#{userId}!=null and #{userId}!=''">
+				userId=#{userId},
+			</if>
+			<if test="#{status}!=null and #{status}!=''">
+				status=#{status},
+			</if>
+			<if test="#{testType}!=null and #{testType}!=''">
+				testType=#{testType},
+			</if>
+			<if test="#{createTime}!=null and #{createTime}!=''">
+				createTime=#{createTime},
+			</if>
+			<if test="#{result}!=null and #{result}!=''">
+				result=#{result},
+			</if>
+			<if test="#{temperature}!=null and #{temperature}!=''">
+				temperature=#{temperature}
+			</if>
+			<where>
+				<if test="#{id}!=null and #{id}!=''">
+					id=#{id}
+				</if>
+			</where>
+		</set>
+
+	</update>
+
+	<!-- 查询检测类型为1即尿酸的检测结果 -->
+	<select id="getTestResult" parameterType="map"
+		resultType="com.laya.health.model.Test">
+		select id,userId,result,createTime from test where userPhone=#{userPhone}
+		and userId=#{userId} and testType=1 order by createTime desc limit 1
+	</select>
+
+	<!-- 通过电话号码查询检测结果中所有成员 -->
+
+	<select id="getMembersInfo" parameterType="String"
+		resultType="com.laya.system.model.Role">
+		select id,headPicture,userName,isRegister,userType,userSex from role where
+		parentId=#{userPhone}
+	</select>
+
+	<!-- 查询指定成员的检测数据 -->
+	
+	<select id="getAllMembersTestResult" parameterType="map" resultType="com.laya.health.model.Test">
+		
+		select * from test  where 1=1
+		 
+		   <if test="userPhone!=null and userPhone!=''">
+		    and  userPhone=#{userPhone}
+		   </if>
+		   
+		   <if test="userId!=null and userId!=''">
+		   and userId=#{userId}
+		   </if>
+		   
+		   <if test="testType!=null and testType!=''">
+		   and testType=#{testType}
+		   </if>
+		   
+		   <if test="targetTime!=null and targetTime!=''">
+		   <![CDATA[
+		   and createTime >=#{targetTime}
+		   ]]>
+		   </if>
+		   
+		   <if test="currentTime!=null and currentTime!=''">
+		   
+		   <![CDATA[
+		   
+		   and createTime <=#{currentTime}
+		   ]]>
+		  
+		  </if>
+		   <![CDATA[
+		   
+		    order by createTime 
+		   ]]>
+		  
+	</select>
+
+  <!-- 查询所有成员信息和血糖检测数据 -->
+	<select id="test" parameterType="String" resultType="map">
+	
+	<![CDATA[
+		select a.id as testId,a.userPhone,a.userId,a.status,a.testType,a.result,a.createTime
+		as testTime,b.id as
+		roleId,b.userType,b.headPicture,b.userName,b.isRegister from (
+
+		select * from test where userPhone=#{userPhone} and testType=1 and
+		createTime in (select max(createTime) from test group by userId))
+        
+		as a right join role as b on a.userId=b.id where parentId=#{userPhone}
+		]]>
+	</select>
+	
+
+	<!-- 通过手机号码,指定成员id,检测类型,检测时间,检测状态,查询检测数据 -->
+	<select id="getResultList" parameterType="map" resultMap="testMap">
+    <![CDATA[
+    
+     select * from test where userPhone=#{userPhone} and userId=#{userId} and status=#{status} and testType=#{testType} and createTime <#{createTime}
+     
+     ]]>
+
+	</select>
+
+</mapper>

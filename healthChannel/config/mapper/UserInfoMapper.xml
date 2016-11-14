@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.laya.system.mapper.UserInfoMapper">	
+
+<resultMap type="com.laya.system.model.UserInfo" id="userMap">
+        <id property="id" column="id"  />  
+        <result property="userName" column="userName"/>  
+        <result property="userPassword" column="userPassword"/>
+        <result property="userPhone" column="userPhone"/>
+        <result property="userEmail" column="userEmail"/>
+        <result property="registerTime" column="registerTime"/>
+        <result property="userType" column="userType"/>
+        <result property="description" column="description"/>
+        <result property="sarft_userId" column="sarft_userId"/>
+</resultMap>
+
+<resultMap type="com.laya.advice.model.LoginMapping" id="mappingMap">
+        <id property="id" column="id"/>
+        <result property="userId" column="userId"/>
+        <result property="mappingId" column="mappingId"/>
+        <result property="verify" column="verify"/>
+</resultMap>
+	<!--  查询此用户是否已存在  -->  
+    <select id="isExsit" parameterType="String" resultType="Integer">  
+       select  count(1) from userInfo where userPhone=#{userPhone}
+    </select>  
+    <!-- 注册新用户 -->
+    <insert id="registerUser" parameterType="com.laya.system.model.UserInfo">
+       insert into userInfo (id,userPassword,userPhone,registerTime)values(
+       <if test="#{id}!=null and #{id}!=''">
+        #{id},
+       </if>
+       <if test="#{userPassword}!=null and #{userPassword}!=''">
+        #{userPassword},
+       </if>
+       <if test="#{userPhone}!=null and #{userPhone}!=''">
+        #{userPhone},
+       </if>
+       <if test="#{registerTime}!=null and #{registerTime}!=''">
+         #{registerTime}
+       </if>
+      )
+    </insert>
+    
+     <select id="findUserByPhone" parameterType="String" resultMap="userMap">
+       select * from userInfo where userPhone=#{userPhone}
+     </select>
+     <!-- 判断用户是否登录成功 -->
+     <select id="isLogin" parameterType="com.laya.system.model.UserInfo" resultMap="userMap">
+       select  * from userInfo  where userPhone=#{userPhone} and userPassword=#{userPassword}
+     </select>
+   
+     <!-- 修改密码 -->
+       <update id="updatePassword" parameterType="map">
+       update userinfo
+       <set>
+         <if test="#{newPassword}!=null and #{newPassword}!=''">
+             userPassword=#{newPassword}
+         </if>
+         <where>
+             id=#{id}
+         </where>
+       
+       </set>
+       
+       </update>
+       
+       <!-- 添加默认成员 -->
+    	<insert id="addDefaultMember" parameterType="com.laya.system.model.Role">
+		insert into role (id,userType, createTime, headPicture, userName,
+		userSex, parentId,isRegister) values(
+
+		<if test="#{id}!=null and #{id}!=''">
+			#{id},
+		</if>
+		
+		<if test="#{userType}!=null and #{userType}!=''">
+			#{userType},
+		</if>
+		<if test="#{createTime}!=null and #{createTime}!=''">
+			#{createTime},
+		</if>
+		<if test="#{parentId}!=null and #{parentId}!=''">
+			#{headPicture},
+		</if>
+		<if test="#{userName}!=null and #{userName}!=''">
+			#{userName},
+		</if>
+		<if test="#{userSex}!=null and #{userSex}!=''">
+			#{userSex},
+		</if>
+		<if test="#{parentId}!=null and #{parentId}!=''">
+			#{parentId},
+		</if>
+		<if test="#{isRegister}!=null and #{isRegister}!=''">
+			#{isRegister}
+		</if>
+		)
+	</insert>
+       
+    <!-- 添加本地用户与39用户映射记录 -->
+	<insert id="addLoginMapping" parameterType="com.laya.advice.model.LoginMapping" useGeneratedKeys="true" keyProperty="id">
+                   
+		insert into login_mapping (userId,mappingId,verify)  values(
+		
+		<if test="#{userId}!=null and #{userId}!=''">
+			#{userId},
+		</if>
+		
+		<if test="#{mappingId}!=null and #{mappingId}!=''">
+			#{mappingId},
+		</if>
+		
+		<if test="#{verify}!=null and #{verify}!=''">
+		    #{verify}
+		</if>
+
+		)
+	</insert>
+	
+	<!-- 通过userId查询映射记录 -->
+	
+	<select id="getMappingByUserId" parameterType="String" resultMap="mappingMap">
+	  
+	     select * from login_mapping  where userId=#{userId}
+	  
+	
+	</select>
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.laya.advice.mapper.AdviceMapper">
+
+<resultMap type="com.laya.advice.model.Question" id="questionMap">
+     <id property="id" column="id"/>
+     <result property="userId" column="userId"/>
+     <result property="tid" column="tid"/>
+     <result property="roleId" column="roleId"/>
+     <result property="memberId" column="memberId"/>
+     <result property="createTime" column="createTime"/>
+     <result property="images" column="images"/>
+</resultMap>
+
+<!-- 添加问题 -->
+   <insert id="addQuestion" parameterType="com.laya.advice.model.Question" useGeneratedKeys="true" keyProperty="id">
+   
+   insert into question (tid, userId, memberId, roleId,createTime,images) values(
+		
+		<if test="#{tid}!=null and #{tid}!=''">
+			#{tid},
+		</if>
+		<if test="#{userId}!=null and #{userId}!=''">
+			#{userId},
+		</if>
+		<if test="#{memberId}!=null and #{memberId}!=''">
+			#{memberId},
+		</if>
+		<if test="#{roleId}!=null and #{roleId}!=''">
+			#{roleId},
+		</if>
+		<if test="#{createTime}!=null and #{createTime}!=''">
+			#{createTime},
+		</if>
+		<if test="#{images}!=null and #{images}!=''">
+		    #{images}
+		</if>
+	
+		)
+   </insert>
+
+   <!-- 查询家庭成员问题列表 -->
+   
+    <select id="getMemberQuestionSet" parameterType="map" resultMap="questionMap">
+    
+     select * from question where userId=#{userId} and roleId=#{roleId}
+     
+    </select>
+    
+    <!-- 通过问题id,电话号码查询家庭成员信息 -->
+    
+    <select id="getMemberInfo" parameterType="map" resultType="map">
+       select userName,userSex from role  as a  left join question as b on a.id=b.roleId 
+       <where>
+          <if test="#{tid}!=null and #{tid}!=''">
+             b.tid=#{tid}
+          </if>
+          <if test="#{userId}!=null and #{userId}!=''">
+            and b.userId=#{userId}
+          </if>
+       </where>
+    </select>
+    
+    <!-- 通过tid删除问题 -->
+    
+    <delete id="deleteQuestion" parameterType="String">
+        delete from question 
+        <where>
+           <if test="#{tid}!=null and #{tid}!=''">
+            tid=#{tid}
+           </if>
+        </where>
+    </delete>
+    
+    <!-- 通过tid查询问题 -->
+    
+    <select id="getQuestionByTid" parameterType="String"  resultMap="questionMap">
+       
+       select * from question where tid=#{tid}
+       
+    </select>
+</mapper>
